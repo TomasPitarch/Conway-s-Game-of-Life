@@ -1,0 +1,24 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI.uss?fileID=7433441132597879392&amp;guid=ec660fc263d638141a9be4151a147c75&amp;type=3#UI"/>
+    <ui:VisualElement name="MainContainer" style="flex-direction: row; height: 100%; width: 100%; align-self: auto;">
+        <ui:VisualElement name="SidePanel" style="align-self: center; justify-content: flex-start;">
+            <ui:Label text="GAME OF LIFE" style="-unity-font-style: bold; font-size: 22px; margin-bottom: 20px; align-self: center; color: rgb(0, 255, 156);"/>
+            <ui:Label text="State" style="-unity-font-style: bold; color: rgb(170, 170, 170); margin-bottom: 5px;"/>
+            <ui:VisualElement class="data-display-container">
+                <ui:Label text="Speed:" style="color: rgb(255, 255, 255);"/>
+                <ui:Label name="LabelCurrentSpeed" text="0 FPS" class="data-label"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="data-display-container">
+                <ui:Label text="Cells count:" style="color: rgb(255, 255, 255);"/>
+                <ui:Label name="LabelAliveCount" text="0" class="data-label"/>
+            </ui:VisualElement>
+            <ui:Label text="Controls" style="margin-top: 15px; -unity-font-style: bold; color: rgb(170, 170, 170);"/>
+            <ui:Button name="BtnStart" text="Start simulation"/>
+            <ui:Button name="BtnPause" text="Pause"/>
+            <ui:Button name="BtnReset" text="Restart"/>
+            <ui:Label text="Configuration" style="margin-top: 15px; -unity-font-style: bold; color: rgb(170, 170, 170);"/>
+            <ui:IntegerField name="FieldTargetCells" label="Cells start" value="500"/>
+            <ui:Slider name="SliderSpeed" label="Adjust speed" low-value="1" high-value="100" value="50"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
