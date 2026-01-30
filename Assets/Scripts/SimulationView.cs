@@ -4,14 +4,14 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class SimulationView : MonoBehaviour
 {
-    [Header("Referencias a la Lógica")]
+    
     public CellsManager cellsManager;
-    public CameraController cameraController;
+    
 
     private SimulationViewModel _viewModel;
     private VisualElement _root;
 
-    // Elementos de la UI
+    
     private Label _labelSpeedDisplay;
     private Label _labelCellCount;
     private IntegerField _fieldTargetCells;
@@ -37,36 +37,50 @@ public class SimulationView : MonoBehaviour
 
        
         _viewModel.OnSpeedChanged += (formattedSpeed) => _labelSpeedDisplay.text = formattedSpeed;
-        _viewModel.OnAliveCellsChanged += (countText) => _labelCellCount.text = countText;
+        cellsManager.OnAliveCellsChanged += UpdateCellCountDisplay;
 
+        _fieldTargetCells.RegisterValueChangedCallback(HandleChangeStartCells);
         
         _btnStart.clicked += HandleStart;
-        _btnPause.clicked += () => Debug.Log("Simulación Pausada"); // Aquí llamarías a cellsManager.Pause()
-        _btnReset.clicked += () => UnityEngine.SceneManagement.SceneManager.LoadScene(0); // Reinicio simple
+        _btnPause.clicked += HandlePause;
 
-        _sliderSpeed.RegisterValueChangedCallback(evt => {
-            _viewModel.SetSpeed(evt.newValue);
-            cellsManager.SetSpeed(evt.newValue);
-        });
+        _sliderSpeed.RegisterValueChangedCallback(HandleChangeSpeed);
         
         _viewModel.SetSpeed(_sliderSpeed.value);
+        
+        HandleChangeStartCells(ChangeEvent<int>.GetPooled(_fieldTargetCells.value, _fieldTargetCells.value));
     }
 
+    private void HandlePause()
+    {
+        cellsManager.PauseSimulation();
+    }
+    private void HandleChangeStartCells(ChangeEvent<int> evt)
+    {
+        _viewModel.SetTargetCells(evt.newValue);
+        cellsManager.seedCount = evt.newValue;
+    }
+
+    private void HandleChangeSpeed(ChangeEvent<float> evt)
+    {
+        _viewModel.SetSpeed(evt.newValue);
+        cellsManager.SetSpeed(evt.newValue);
+    }
+    
+
     private void HandleStart()
-    { // int target = _fieldTargetCells.value;
-        // _viewModel.SetTargetCells(target);
+    { 
         cellsManager.StartSimulation();
     }
     
     public void UpdateCellCountDisplay(int currentCount)
     {
         _viewModel.UpdateAliveCells(currentCount);
+        _labelCellCount.text = currentCount.ToString();
     }
 
     void OnDisable()
     {
-        
         _btnStart.clicked -= HandleStart;
-        
     }
 }

@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI
   cellsManager: {fileID: 1599467718}
+  cameraController: {fileID: 895804614}
 --- !u!114 &107088255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -579,9 +580,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellsManager
   _spriteRenderer: {fileID: 1263229264}
-  width: 1000
-  height: 1000
-  liveColor: {r: 0, g: 1, b: 0, a: 1}
+  width: 500
+  height: 500
+  liveColor: {r: 1, g: 1, b: 1, a: 1}
   deadColor: {r: 0, g: 0, b: 0, a: 1}
   seedCount: 50000
 --- !u!4 &1599467719

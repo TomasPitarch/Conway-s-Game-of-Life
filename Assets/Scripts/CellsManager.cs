@@ -8,10 +8,12 @@ public class CellsManager : MonoBehaviour
     
     [SerializeField] private SpriteRenderer _spriteRenderer;
 
-    [Header("Ajustes de la Rejilla")] public int width = 256;
+    [Header("Texture map size")] public int width = 256;
     public int height = 256;
+    [SerializeField]private Color liveColor = Color.white;
+    [SerializeField]private Color deadColor = Color.black;
 
-
+    [HideInInspector]
     public int seedCount = 250;
 
     private Texture2D _texture;
@@ -20,16 +22,17 @@ public class CellsManager : MonoBehaviour
     private float _speed = 60f;
 
     System.Random _random = new System.Random();
+    private bool isOnPause = false;
     private Coroutine _simulationCoroutine;
 
     void Awake()
     {
         _random = new System.Random();
+        
         _currentGeneration = new bool[width * height];
         _nextGeneration = new bool[width * height];
+        
         _texture = new Texture2D(width, height);
-
-
         _texture.filterMode = FilterMode.Point;
         _texture.wrapMode = TextureWrapMode.Clamp;
 
@@ -37,8 +40,8 @@ public class CellsManager : MonoBehaviour
         _spriteRenderer.sprite = Sprite.Create(
             _texture,
             new Rect(0, 0, width, height),
-            new Vector2(0.5f, 0.5f), // Pivot en el centro
-            100f // Pixels Per Unit (PPU)
+            new Vector2(0.5f, 0.5f), 
+            100f 
         );
     }
 
@@ -65,7 +68,7 @@ public class CellsManager : MonoBehaviour
         int y = 0;
         for (int i = 0; i < _currentGeneration.Length; i++)
         {
-            colors[i] = _currentGeneration[i] ? Color.black : Color.white;
+            colors[i] = _currentGeneration[i] ? liveColor : deadColor;
         }
 
         _texture.SetPixels32(colors);
@@ -89,7 +92,6 @@ public class CellsManager : MonoBehaviour
                 }
                 else
                 {
-                   
                     _nextGeneration[index] = (neighbors == 3);
                     if (_nextGeneration[index]) aliveCount++;
                 }
@@ -101,6 +103,7 @@ public class CellsManager : MonoBehaviour
     public void StartSimulation()
     {
         GenerateCells();
+        isOnPause = false;
         if (_simulationCoroutine is null)
         {
             _simulationCoroutine = StartCoroutine(nameof(SimulationLoop));
@@ -134,24 +137,25 @@ public class CellsManager : MonoBehaviour
     {
         while (true) 
         {
+            if (isOnPause) 
+            {
+                yield return null; 
+                continue; 
+            }
             Simulation(); 
             PaintCells();
             yield return new WaitForSeconds(1/_speed);
         }
         
     }
-    public void StopSimulation()
-    {
-        if (_simulationCoroutine is not null)
-        {
-            StopCoroutine(_simulationCoroutine);
-            _simulationCoroutine = null;
-            ClearCells();
-        }
-    }
     public void SetSpeed(float newSpeed)
     {
         _speed = newSpeed;
+    }
+
+    public void PauseSimulation()
+    {
+        isOnPause = !isOnPause;
     }
 }
    

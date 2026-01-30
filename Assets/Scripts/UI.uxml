@@ -17,7 +17,7 @@
             <ui:Button name="BtnPause" text="Pause"/>
             <ui:Button name="BtnReset" text="Restart"/>
             <ui:Label text="Configuration" style="margin-top: 15px; -unity-font-style: bold; color: rgb(170, 170, 170);"/>
-            <ui:IntegerField name="FieldTargetCells" label="Cells start" value="500"/>
+            <ui:IntegerField name="FieldTargetCells" label="Cells start" value="50000"/>
             <ui:Slider name="SliderSpeed" label="Adjust speed" low-value="1" high-value="100" value="50"/>
         </ui:VisualElement>
     </ui:VisualElement>
