@@ -578,12 +578,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52c740a6f33778c409cc16091b5fc6a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellsManager
+  currentType: 1
+  width: 2000
+  height: 2000
+  liveColor:
+    serializedVersion: 2
+    rgba: 4278255360
+  deadColor:
+    serializedVersion: 2
+    rgba: 4278190080
   _spriteRenderer: {fileID: 1263229264}
-  width: 1000
-  height: 1000
-  liveColor: {r: 0, g: 1, b: 0, a: 1}
-  deadColor: {r: 0, g: 0, b: 0, a: 1}
   seedCount: 50000
+  _speed: 60
 --- !u!4 &1599467719
 Transform:
   m_ObjectHideFlags: 0

@@ -1,42 +1,54 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 public class CellsManager : MonoBehaviour
 {
     public event Action<int> OnAliveCellsChanged;
     
+    [Header("Settings")]
+    public SimulationType currentType; // Cambia esto en el Inspector en tiempo real
+    
+    private Dictionary<SimulationType,ISimulationStrategy> simulationStrategies;
+    
+    private ISimulationStrategy _currentSimulationStrategy;
+   
+
+    
+    public int width = 512;
+    public int height = 512;
+    [SerializeField] private Color32 liveColor = Color.white;
+    [SerializeField] private Color32 deadColor = Color.black;
     [SerializeField] private SpriteRenderer _spriteRenderer;
 
-    [Header("Texture map size")] public int width = 256;
-    public int height = 256;
-    [SerializeField]private Color liveColor = Color.white;
-    [SerializeField]private Color deadColor = Color.black;
-
     [HideInInspector]
-    public int seedCount = 250;
+    public int seedCount = 50000;
+    [SerializeField] private float _speed = 60f;
 
+    private System.Random random=new System.Random();
     private Texture2D _texture;
-    private bool[] _currentGeneration;
-    private bool[] _nextGeneration;
-    private float _speed = 60f;
-
-    System.Random _random = new System.Random();
-    private bool isOnPause = false;
+    private NativeArray<bool> _currentGeneration;
+    private NativeArray<bool> _nextGeneration;
+    private bool _isOnPause = false;
     private Coroutine _simulationCoroutine;
 
     void Awake()
     {
-        _random = new System.Random();
+        _currentGeneration = new NativeArray<bool>(width * height, Allocator.Persistent);
+        _nextGeneration = new NativeArray<bool>(width * height, Allocator.Persistent);
+
+        simulationStrategies = new Dictionary<SimulationType, ISimulationStrategy>();
+        simulationStrategies.Add(SimulationType.Classic,new ClassicSimulation());
+        simulationStrategies.Add(SimulationType.Burst, new BurstSimulation());
         
-        _currentGeneration = new bool[width * height];
-        _nextGeneration = new bool[width * height];
         
-        _texture = new Texture2D(width, height);
+        _texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
         _texture.filterMode = FilterMode.Point;
         _texture.wrapMode = TextureWrapMode.Clamp;
 
-
+        
         _spriteRenderer.sprite = Sprite.Create(
             _texture,
             new Rect(0, 0, width, height),
@@ -47,117 +59,76 @@ public class CellsManager : MonoBehaviour
 
     private void GenerateCells()
     {
-        ClearCells();
+        
+        for (int i = 0; i < _currentGeneration.Length; i++) _currentGeneration[i] = false;
+
+        
         for (int i = 0; i < seedCount; i++)
         {
-            int x = _random.Next(0, width);
-            int y = _random.Next(0, height);
-
-            _currentGeneration[(y * width) + x] = true;
+            int x = random.Next(0, width);
+            int y = random.Next(0, height);
+            _currentGeneration[y * width + x] = true;
         }
     }
 
-    private void ClearCells()
+    private void SimulationStep()
     {
-        System.Array.Clear(_currentGeneration, 0, _currentGeneration.Length);
-    }
-    private void PaintCells()
-    {
-        Color32[] colors = new Color32[_currentGeneration.Length];
-        int x = 0;
-        int y = 0;
-        for (int i = 0; i < _currentGeneration.Length; i++)
-        {
-            colors[i] = _currentGeneration[i] ? liveColor : deadColor;
-        }
+       
+        _currentSimulationStrategy = simulationStrategies[currentType];
 
-        _texture.SetPixels32(colors);
+        if (_currentSimulationStrategy == null) return;
+
+        
+        NativeArray<Color32> textureData = _texture.GetRawTextureData<Color32>();
+
+         _currentSimulationStrategy.ExecuteStep(
+            ref _currentGeneration, 
+            ref _nextGeneration, 
+            ref textureData, 
+            width, height, 
+            liveColor, deadColor
+        );
+
+        
+        _currentGeneration.CopyFrom(_nextGeneration);
+
+        
         _texture.Apply();
-    }
-    private void Simulation()
-    {
-        int aliveCount = 0;
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-               
-                int index = y * width + x;
-                int neighbors = CountLiveNeighbors(x, y);
 
-                if (_currentGeneration[index])
-                {
-                    _nextGeneration[index] = (neighbors == 2 || neighbors == 3);
-                    if (_nextGeneration[index]) aliveCount++;
-                }
-                else
-                {
-                    _nextGeneration[index] = (neighbors == 3);
-                    if (_nextGeneration[index]) aliveCount++;
-                }
-            }
-        }
-        System.Array.Copy(_nextGeneration, _currentGeneration, _currentGeneration.Length);
-        OnAliveCellsChanged?.Invoke(aliveCount);
+        
+        //OnAliveCellsChanged?.Invoke(aliveCount);
     }
-    public void StartSimulation()
-    {
-        GenerateCells();
-        isOnPause = false;
-        if (_simulationCoroutine is null)
-        {
-            _simulationCoroutine = StartCoroutine(nameof(SimulationLoop));
-        }
-    }
-    private int CountLiveNeighbors(int x, int y)
-    {
-        int liveNeighbors = 0;
 
-        for (int offsetY = -1; offsetY <= 1; offsetY++)
-        {
-            for (int offsetX = -1; offsetX <= 1; offsetX++)
-            {
-                if (offsetX == 0 && offsetY == 0) continue; 
-
-                
-                int nx = (x + offsetX + width) % width;
-                int ny = (y + offsetY + height) % height;
-
-                
-                if (_currentGeneration[ny * width + nx])
-                {
-                    liveNeighbors++;
-                }
-            }
-        }
-        return liveNeighbors;
-    }
-    
     private IEnumerator SimulationLoop()
     {
         while (true) 
         {
-            if (isOnPause) 
+            if (!_isOnPause) 
             {
-                yield return null; 
-                continue; 
+                SimulationStep();
             }
-            Simulation(); 
-            PaintCells();
-            yield return new WaitForSeconds(1/_speed);
+            
+            yield return new WaitForSeconds(1f / _speed);
         }
-        
-    }
-    public void SetSpeed(float newSpeed)
-    {
-        _speed = newSpeed;
     }
 
-    public void PauseSimulation()
+    
+    public void StartSimulation()
     {
-        isOnPause = !isOnPause;
+        GenerateCells();
+        _isOnPause = false;
+        if (_simulationCoroutine == null)
+            _simulationCoroutine = StartCoroutine(SimulationLoop());
+    }
+
+    public void PauseSimulation() => _isOnPause = !_isOnPause;
+
+    public void SetSpeed(float newSpeed) => _speed = newSpeed;
+
+    private void OnDestroy()
+    {
+        if (_currentGeneration.IsCreated) _currentGeneration.Dispose();
+        if (_nextGeneration.IsCreated) _nextGeneration.Dispose();
     }
 }
-   
-    
-
+public enum SimulationType { Classic, Burst }
