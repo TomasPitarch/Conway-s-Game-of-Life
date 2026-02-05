@@ -61,3 +61,15 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# IDE settings
+.idea/
+.vscode/
+
+# Unity user settings
+UserSettings/
+
+# UI Elements Schemas
+UIElementsSchema/
+
+# Recovery files
+Assets/_Recovery/

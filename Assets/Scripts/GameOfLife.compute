@@ -1,0 +1,36 @@
+#pragma kernel CSMain
+
+StructuredBuffer<int> currentGen;
+RWStructuredBuffer<int> nextGen;
+RWStructuredBuffer<uint> colors;
+
+uint width;
+uint height;
+uint liveColor;
+uint deadColor;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= width || id.y >= height) return;
+
+    uint index = id.y * width + id.x;
+    int neighbors = 0;
+
+    for (int offsetY = -1; offsetY <= 1; offsetY++) {
+        for (int offsetX = -1; offsetX <= 1; offsetX++) {
+            if (offsetX == 0 && offsetY == 0) continue;
+
+            int nx = (int(id.x) + offsetX + int(width)) % int(width);
+            int ny = (int(id.y) + offsetY + int(height)) % int(height);
+
+            if (currentGen[ny * width + nx] > 0) neighbors++;
+        }
+    }
+
+    int alive = currentGen[index];
+    int willBeAlive = (alive > 0) ? ((neighbors == 2 || neighbors == 3) ? 1 : 0) : ((neighbors == 3) ? 1 : 0);
+
+    nextGen[index] = willBeAlive;
+    colors[index] = (willBeAlive > 0) ? liveColor : deadColor;
+}

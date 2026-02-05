@@ -1,0 +1,69 @@
+
+#SidePanel {
+    background-color: rgba(25, 25, 25, 0.9);
+    border-width: 2px;
+    border-color: rgba(0, 255, 156, 0.3);
+    border-radius: 20px;
+    padding: 20px;
+    transition-duration: 300ms;
+}
+
+
+.unity-button {
+    border-radius: 8px;
+    border-width: 0;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: white;
+    font-size: 14px;
+    -unity-font-style: bold;
+    transition-duration: 100ms;
+}
+
+.unity-button:hover {
+    scale: 1.05;
+    background-color: #333333;
+}
+
+
+#BtnStart { background-color: #2D5A27; }
+#BtnStart:hover { background-color: #3E7C36; border-color: #00FF9C; border-width: 1px; }
+
+#BtnPause { background-color: #5A4A27; }
+#BtnReset { background-color: #5A2727; }
+
+
+.data-display-container {
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+}
+
+.data-label {
+    color: #00FF9C;
+    -unity-font-style: bold;
+    font-size: 14px;
+}
+
+
+.unity-base-field__label {
+    color: #CCCCCC;
+    min-width: 100px;
+}
+
+.unity-integer-field__input {
+    background-color: #111111;
+    border-color: #333333;
+    border-radius: 4px;
+    color: #00FF9C;
+    padding: 4px;
+}
+
+.unity-base-slider__dragger {
+    background-color: #00FF9C;
+    border-radius: 10px;
+}
