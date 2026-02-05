@@ -95,8 +95,13 @@ public class CellsManager : MonoBehaviour
         
         _texture.Apply();
 
+        int aliveCount = 0;
+        for (int i = 0; i < _currentGeneration.Length; i++)
+        {
+            if (_currentGeneration[i]) aliveCount++;
+        }
         
-        //OnAliveCellsChanged?.Invoke(aliveCount);
+        OnAliveCellsChanged?.Invoke(aliveCount);
     }
 
     private IEnumerator SimulationLoop()
