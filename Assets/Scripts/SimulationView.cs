@@ -4,14 +4,11 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class SimulationView : MonoBehaviour
 {
-    
-    public CellsManager cellsManager;
-    
+    [SerializeField] private CellsManager cellsManager;
 
     private SimulationViewModel _viewModel;
     private VisualElement _root;
 
-    
     private Label _labelSpeedDisplay;
     private Label _labelCellCount;
     private IntegerField _fieldTargetCells;
@@ -20,11 +17,13 @@ public class SimulationView : MonoBehaviour
 
     private void Awake()
     {
-        _viewModel = new SimulationViewModel();
+        _viewModel = new SimulationViewModel(cellsManager);
         _root = GetComponent<UIDocument>().rootVisualElement;
+
+        InitializeUIElements();
     }
 
-    void OnEnable()
+    private void InitializeUIElements()
     {
         _labelSpeedDisplay = _root.Q<Label>("LabelCurrentSpeed");
         _labelCellCount = _root.Q<Label>("LabelAliveCount");
@@ -34,53 +33,68 @@ public class SimulationView : MonoBehaviour
         _btnStart = _root.Q<Button>("BtnStart");
         _btnPause = _root.Q<Button>("BtnPause");
         _btnReset = _root.Q<Button>("BtnReset");
+    }
 
-       
-        _viewModel.OnSpeedChanged += (formattedSpeed) => _labelSpeedDisplay.text = formattedSpeed;
-        cellsManager.OnAliveCellsChanged += UpdateCellCountDisplay;
-
-        _fieldTargetCells.RegisterValueChangedCallback(HandleChangeStartCells);
+    private void OnEnable()
+    {
+        BindViewModel();
+        BindUIElements();
         
-        _btnStart.clicked += HandleStart;
-        _btnPause.clicked += HandlePause;
-
-        _sliderSpeed.RegisterValueChangedCallback(HandleChangeSpeed);
-        
+        // Set initial state
         _viewModel.SetSpeed(_sliderSpeed.value);
-        
-        HandleChangeStartCells(ChangeEvent<int>.GetPooled(_fieldTargetCells.value, _fieldTargetCells.value));
+        _viewModel.SetTargetCells(_fieldTargetCells.value);
     }
 
-    private void HandlePause()
+    private void OnDisable()
     {
-        cellsManager.PauseSimulation();
-    }
-    private void HandleChangeStartCells(ChangeEvent<int> evt)
-    {
-        _viewModel.SetTargetCells(evt.newValue);
-        cellsManager.seedCount = evt.newValue;
+        UnbindViewModel();
+        UnbindUIElements();
+
+        // Perform ViewModel cleanup to avoid memory leaks
+        _viewModel.Cleanup();
     }
 
-    private void HandleChangeSpeed(ChangeEvent<float> evt)
+    private void BindViewModel()
     {
-        _viewModel.SetSpeed(evt.newValue);
-        cellsManager.SetSpeed(evt.newValue);
-    }
-    
-
-    private void HandleStart()
-    { 
-        cellsManager.StartSimulation();
-    }
-    
-    public void UpdateCellCountDisplay(int currentCount)
-    {
-        _viewModel.UpdateAliveCells(currentCount);
-        _labelCellCount.text = currentCount.ToString();
+        _viewModel.OnSpeedChanged += HandleSpeedChanged;
+        _viewModel.OnAliveCellsChanged += HandleAliveCellsChanged;
+        _viewModel.OnTargetCellsChanged += HandleTargetCellsChanged;
+        _viewModel.OnPauseStatusChanged += HandlePauseStatusChanged;
     }
 
-    void OnDisable()
+    private void UnbindViewModel()
     {
-        _btnStart.clicked -= HandleStart;
+        _viewModel.OnSpeedChanged -= HandleSpeedChanged;
+        _viewModel.OnAliveCellsChanged -= HandleAliveCellsChanged;
+        _viewModel.OnTargetCellsChanged -= HandleTargetCellsChanged;
+        _viewModel.OnPauseStatusChanged -= HandlePauseStatusChanged;
     }
+
+    private void BindUIElements()
+    {
+        _btnStart.clicked += _viewModel.StartSimulation;
+        _btnPause.clicked += _viewModel.TogglePause;
+
+        _sliderSpeed.RegisterValueChangedCallback(HandleSpeedSliderChanged);
+        _fieldTargetCells.RegisterValueChangedCallback(HandleTargetCellsFieldChanged);
+    }
+
+    private void UnbindUIElements()
+    {
+        _btnStart.clicked -= _viewModel.StartSimulation;
+        _btnPause.clicked -= _viewModel.TogglePause;
+
+        _sliderSpeed.UnregisterValueChangedCallback(HandleSpeedSliderChanged);
+        _fieldTargetCells.UnregisterValueChangedCallback(HandleTargetCellsFieldChanged);
+    }
+
+    // ViewModel Event Handlers
+    private void HandleSpeedChanged(string formattedSpeed) => _labelSpeedDisplay.text = formattedSpeed;
+    private void HandleAliveCellsChanged(int count) => _labelCellCount.text = count.ToString();
+    private void HandleTargetCellsChanged(int target) => _fieldTargetCells.value = target;
+    private void HandlePauseStatusChanged(bool isPaused) => _btnPause.text = isPaused ? "Resume" : "Pause";
+
+    // UI Event Handlers
+    private void HandleSpeedSliderChanged(ChangeEvent<float> evt) => _viewModel.SetSpeed(evt.newValue);
+    private void HandleTargetCellsFieldChanged(ChangeEvent<int> evt) => _viewModel.SetTargetCells(evt.newValue);
 }
