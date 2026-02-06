@@ -1,9 +1,8 @@
 {
-    "name": "GameOfLife.Camera",
-    "rootNamespace": "GameOfLife.Camera",
+    "name": "GameOfLife.Input",
+    "rootNamespace": "",
     "references": [
-        "Unity.InputSystem",
-        "GameOfLife.Input"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
