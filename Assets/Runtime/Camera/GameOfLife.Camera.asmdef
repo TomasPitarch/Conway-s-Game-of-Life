@@ -1,0 +1,17 @@
+{
+    "name": "GameOfLife.Camera",
+    "rootNamespace": "GameOfLife.Camera",
+    "references": [
+        "Unity.InputSystem",
+        "GameOfLife.Input"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

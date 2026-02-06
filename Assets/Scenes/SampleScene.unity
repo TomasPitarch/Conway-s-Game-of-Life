@@ -468,6 +468,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1263229265}
   - component: {fileID: 1263229264}
+  - component: {fileID: 1263229266}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -549,6 +550,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1263229266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263229263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52d34bfb0129ce34bb350d9201911f2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameOfLife.Simulation::GameOfLife.Simulation.SimulationRenderer
+  spriteRenderer: {fileID: 1263229264}
 --- !u!1 &1599467717
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,17 +593,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellsManager
   currentType: 1
-  width: 1000
-  height: 1000
+  simulationRenderer: {fileID: 1263229266}
+  width: 750
+  height: 750
   liveColor:
     serializedVersion: 2
     rgba: 4278255360
   deadColor:
     serializedVersion: 2
     rgba: 4278190080
-  _spriteRenderer: {fileID: 1263229264}
   seedCount: 50000
-  _speed: 60
+  speed: 60
 --- !u!4 &1599467719
 Transform:
   m_ObjectHideFlags: 0
