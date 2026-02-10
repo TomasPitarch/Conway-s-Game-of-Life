@@ -30,8 +30,26 @@
             </ui:VisualElement>
             <ui:Button name="BtnApplyDimensions" text="Resize &amp; Reset" class="config-button"/>
 
-            <ui:TextField name="FieldLiveColor" label="Live Hex" value="#FFFFFF"/>
-            <ui:TextField name="FieldDeadColor" label="Dead Hex" value="#000000"/>
+            <ui:Label text="COLORS" class="section-header"/>
+            <ui:VisualElement class="color-picker-section">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between;">
+                    <ui:Label text="Live Color" style="font-size: 11px; color: #AAAAAA;"/>
+                    <ui:VisualElement name="PreviewLive" class="color-preview"/>
+                </ui:VisualElement>
+                <ui:SliderInt name="SliderLiveR" label="R" low-value="0" high-value="255" class="compact-slider"/>
+                <ui:SliderInt name="SliderLiveG" label="G" low-value="0" high-value="255" class="compact-slider"/>
+                <ui:SliderInt name="SliderLiveB" label="B" low-value="0" high-value="255" class="compact-slider"/>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="color-picker-section">
+                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between;">
+                    <ui:Label text="Dead Color" style="font-size: 11px; color: #AAAAAA;"/>
+                    <ui:VisualElement name="PreviewDead" class="color-preview"/>
+                </ui:VisualElement>
+                <ui:SliderInt name="SliderDeadR" label="R" low-value="0" high-value="255" class="compact-slider"/>
+                <ui:SliderInt name="SliderDeadG" label="G" low-value="0" high-value="255" class="compact-slider"/>
+                <ui:SliderInt name="SliderDeadB" label="B" low-value="0" high-value="255" class="compact-slider"/>
+            </ui:VisualElement>
 
             <ui:Label text="CONTROLS" class="section-header"/>
             <ui:VisualElement style="flex-direction: row; justify-content: space-between;">
