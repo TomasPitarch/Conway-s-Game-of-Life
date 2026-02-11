@@ -100,7 +100,7 @@ namespace GameOfLife.UI
             r.value = color.r;
             g.value = color.g;
             b.value = color.b;
-            preview.style.backgroundColor = color;
+            preview.style.backgroundColor = new StyleColor(color);;
         }
 
         private void OnDisable()
@@ -190,14 +190,14 @@ namespace GameOfLife.UI
         private void HandleLiveColorChanged()
         {
             Color32 color = new Color32((byte)_sliderLiveR.value, (byte)_sliderLiveG.value, (byte)_sliderLiveB.value, 255);
-            _previewLive.style.backgroundColor = color;
+            _previewLive.style.backgroundColor = new StyleColor(color);
             _viewModel.SetLiveColor(color);
         }
 
         private void HandleDeadColorChanged()
         {
             Color32 color = new Color32((byte)_sliderDeadR.value, (byte)_sliderDeadG.value, (byte)_sliderDeadB.value, 255);
-            _previewDead.style.backgroundColor = color;
+            _previewDead.style.backgroundColor = new StyleColor(color);
             _viewModel.SetDeadColor(color);
         }
 

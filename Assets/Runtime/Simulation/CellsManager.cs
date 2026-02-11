@@ -28,7 +28,7 @@ namespace GameOfLife.Simulation
 
         [HideInInspector]
         public int seedCount = 50000;
-        [SerializeField] private float speed = 60f;
+        [SerializeField] public float speed = 60f;
 
         private System.Random _random = new System.Random();
         private NativeArray<bool> _currentGeneration;
