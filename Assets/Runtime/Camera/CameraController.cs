@@ -15,6 +15,13 @@ namespace GameOfLife.Camera
         public float smoothness = 10f;
         public float minZoom = 2f;
         public float maxZoom = 20f;
+        public float zoomThreshold = 0.1f;
+
+        [Header("Ajustes de Paneo")]
+        public float panSpeed = 1f;
+
+        private bool _isPanning;
+        private Vector3 _dragOrigin;
 
         private float _targetZoom;
         private Vector3 _targetPosition;
@@ -31,6 +38,44 @@ namespace GameOfLife.Camera
             _targetZoom = _camera.orthographicSize;
             _targetPosition = _camera.transform.position;
             _input.UI.ScrollWheel.performed += OnScrollZoom;
+
+            // Use 'performed' to start the action, but rely on IsPressed in the routine for stopping
+            _input.UI.RightClick.performed += _ => StartPan();
+            _input.UI.MiddleClick.performed += _ => StartPan();
+        }
+
+        private void StartPan()
+        {
+            // Only start if not already panning
+            if (!_isPanning)
+            {
+                _isPanning = true;
+                _dragOrigin = _camera.ScreenToWorldPoint(_input.UI.Point.ReadValue<Vector2>());
+                StartCoroutine(PanRoutine());
+            }
+        }
+
+        private IEnumerator PanRoutine()
+        {
+            while (_isPanning)
+            {
+                // Check if button is still held down
+                if (!_input.UI.RightClick.IsPressed() && !_input.UI.MiddleClick.IsPressed())
+                {
+                    _isPanning = false;
+                    yield break;
+                }
+
+                Vector3 currentPos = _camera.ScreenToWorldPoint(_input.UI.Point.ReadValue<Vector2>());
+                Vector3 difference = _dragOrigin - currentPos;
+
+                difference.z = 0; // Lock Z axis
+
+                _camera.transform.position += difference;
+                _targetPosition += difference;
+
+                yield return null;
+            }
         }
 
         private void OnScrollZoom(InputAction.CallbackContext context)
@@ -55,7 +100,7 @@ namespace GameOfLife.Camera
 
         private IEnumerator SmoothZoom()
         {
-            while (Mathf.Abs(_camera.orthographicSize - _targetZoom) > 0.01f)
+            while (Mathf.Abs(_camera.orthographicSize - _targetZoom) > zoomThreshold || Vector3.Distance(_camera.transform.position, _targetPosition) > zoomThreshold)
             {
                 _camera.orthographicSize = Mathf.Lerp(_camera.orthographicSize, _targetZoom, Time.deltaTime * zoomSpeed);
                 _camera.transform.position = Vector3.Lerp(_camera.transform.position, _targetPosition, Time.deltaTime * zoomSpeed);
