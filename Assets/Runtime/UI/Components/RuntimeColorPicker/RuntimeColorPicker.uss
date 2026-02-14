@@ -1,0 +1,58 @@
+.runtime-color-picker {
+    flex-direction: column;
+    margin-bottom: 10px;
+    background-color: #2b2b2b;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#sv-box {
+    height: 120px;
+    width: 100%;
+    margin-bottom: 5px;
+    border-width: 1px;
+    border-color: #555;
+}
+
+#sv-cursor {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    border-width: 2px;
+    border-color: white;
+    position: absolute;
+    margin-top: 0;
+    margin-left: 0;
+}
+
+#controls-container {
+    flex-direction: row;
+    height: 20px;
+    align-items: center;
+}
+
+#hue-bar {
+    flex-grow: 1;
+    height: 100%;
+    margin-right: 5px;
+    border-width: 1px;
+    border-color: #555;
+    justify-content: center; 
+}
+
+#hue-cursor {
+    width: 5px;
+    height: 100%;
+    background-color: white;
+    border-width: 1px;
+    border-color: black;
+    position: absolute;
+}
+
+#color-preview {
+    width: 30px;
+    height: 100%;
+    border-width: 1px;
+    border-color: #555;
+    border-radius: 3px;
+}

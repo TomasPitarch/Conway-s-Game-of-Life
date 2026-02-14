@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/Runtime/UI/UI.uss" />
+    <Style src="project://database/Assets/Runtime/UI/Features/Simulation/Simulation.uss" />
+    <Style src="project://database/Assets/Runtime/UI/Components/RuntimeColorPicker/RuntimeColorPicker.uss" />
     <ui:VisualElement name="MainContainer" style="flex-direction: row; height: 100%; width: 100%; align-self: auto;">
         <ui:VisualElement name="SidePanel" style="align-self: center; justify-content: flex-start;">
             <ui:Label text="GAME OF LIFE" style="-unity-font-style: bold; font-size: 22px; margin-bottom: 10px; align-self: center; color: rgb(0, 255, 156);"/>
@@ -32,23 +33,13 @@
 
             <ui:Label text="COLORS" class="section-header"/>
             <ui:VisualElement class="color-picker-section">
-                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between;">
-                    <ui:Label text="Live Color" style="font-size: 11px; color: #AAAAAA;"/>
-                    <ui:VisualElement name="PreviewLive" class="color-preview"/>
-                </ui:VisualElement>
-                <ui:SliderInt name="SliderLiveR" label="R" low-value="0" high-value="255" class="compact-slider"/>
-                <ui:SliderInt name="SliderLiveG" label="G" low-value="0" high-value="255" class="compact-slider"/>
-                <ui:SliderInt name="SliderLiveB" label="B" low-value="0" high-value="255" class="compact-slider"/>
+                <ui:Label text="Live Color" style="font-size: 11px; color: #AAAAAA; margin-bottom: 5px;"/>
+                <GameOfLife.UI.RuntimeColorPicker name="PickerLive" />
             </ui:VisualElement>
 
             <ui:VisualElement class="color-picker-section">
-                <ui:VisualElement style="flex-direction: row; align-items: center; justify-content: space-between;">
-                    <ui:Label text="Dead Color" style="font-size: 11px; color: #AAAAAA;"/>
-                    <ui:VisualElement name="PreviewDead" class="color-preview"/>
-                </ui:VisualElement>
-                <ui:SliderInt name="SliderDeadR" label="R" low-value="0" high-value="255" class="compact-slider"/>
-                <ui:SliderInt name="SliderDeadG" label="G" low-value="0" high-value="255" class="compact-slider"/>
-                <ui:SliderInt name="SliderDeadB" label="B" low-value="0" high-value="255" class="compact-slider"/>
+                <ui:Label text="Dead Color" style="font-size: 11px; color: #AAAAAA; margin-bottom: 5px;"/>
+                <GameOfLife.UI.RuntimeColorPicker name="PickerDead" />
             </ui:VisualElement>
 
             <ui:Label text="CONTROLS" class="section-header"/>

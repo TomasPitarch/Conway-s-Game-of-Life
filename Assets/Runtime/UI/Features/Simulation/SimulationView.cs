@@ -21,9 +21,8 @@ namespace GameOfLife.UI
         private IntegerField _fieldWidth;
         private IntegerField _fieldHeight;
 
-        private SliderInt _sliderLiveR, _sliderLiveG, _sliderLiveB;
-        private SliderInt _sliderDeadR, _sliderDeadG, _sliderDeadB;
-        private VisualElement _previewLive, _previewDead;
+        private RuntimeColorPicker _pickerLive;
+        private RuntimeColorPicker _pickerDead;
 
         private DropdownField _dropdownStrategy;
         private Slider _sliderSpeed;
@@ -47,15 +46,8 @@ namespace GameOfLife.UI
             _fieldWidth = _root.Q<IntegerField>("FieldWidth");
             _fieldHeight = _root.Q<IntegerField>("FieldHeight");
 
-            _sliderLiveR = _root.Q<SliderInt>("SliderLiveR");
-            _sliderLiveG = _root.Q<SliderInt>("SliderLiveG");
-            _sliderLiveB = _root.Q<SliderInt>("SliderLiveB");
-            _previewLive = _root.Q<VisualElement>("PreviewLive");
-
-            _sliderDeadR = _root.Q<SliderInt>("SliderDeadR");
-            _sliderDeadG = _root.Q<SliderInt>("SliderDeadG");
-            _sliderDeadB = _root.Q<SliderInt>("SliderDeadB");
-            _previewDead = _root.Q<VisualElement>("PreviewDead");
+            _pickerLive = _root.Q<RuntimeColorPicker>("PickerLive");
+            _pickerDead = _root.Q<RuntimeColorPicker>("PickerDead");
 
             _dropdownStrategy = _root.Q<DropdownField>("DropdownStrategy");
             _dropdownStrategy.choices = new List<string> { SimulationType.Classic.ToString(), SimulationType.Burst.ToString() };
@@ -91,16 +83,8 @@ namespace GameOfLife.UI
             _fieldHeight.value = cellsManager.height;
             _dropdownStrategy.value = cellsManager.currentType.ToString();
 
-            InitializeColorSliders(cellsManager.liveColor, _sliderLiveR, _sliderLiveG, _sliderLiveB, _previewLive);
-            InitializeColorSliders(cellsManager.deadColor, _sliderDeadR, _sliderDeadG, _sliderDeadB, _previewDead);
-        }
-
-        private void InitializeColorSliders(Color32 color, SliderInt r, SliderInt g, SliderInt b, VisualElement preview)
-        {
-            r.value = color.r;
-            g.value = color.g;
-            b.value = color.b;
-            preview.style.backgroundColor = new StyleColor(color);;
+            _pickerLive.value = cellsManager.liveColor;
+            _pickerDead.value = cellsManager.deadColor;
         }
 
         private void OnDisable()
@@ -140,13 +124,8 @@ namespace GameOfLife.UI
             _fieldWidth.RegisterValueChangedCallback(HandleWidthChanged);
             _fieldHeight.RegisterValueChangedCallback(HandleHeightChanged);
 
-            _sliderLiveR.RegisterValueChangedCallback(_ => HandleLiveColorChanged());
-            _sliderLiveG.RegisterValueChangedCallback(_ => HandleLiveColorChanged());
-            _sliderLiveB.RegisterValueChangedCallback(_ => HandleLiveColorChanged());
-
-            _sliderDeadR.RegisterValueChangedCallback(_ => HandleDeadColorChanged());
-            _sliderDeadG.RegisterValueChangedCallback(_ => HandleDeadColorChanged());
-            _sliderDeadB.RegisterValueChangedCallback(_ => HandleDeadColorChanged());
+            _pickerLive.OnColorChanged += HandleLiveColorChanged;
+            _pickerDead.OnColorChanged += HandleDeadColorChanged;
 
             _dropdownStrategy.RegisterValueChangedCallback(HandleStrategyChanged);
         }
@@ -163,13 +142,8 @@ namespace GameOfLife.UI
             _fieldWidth.UnregisterValueChangedCallback(HandleWidthChanged);
             _fieldHeight.UnregisterValueChangedCallback(HandleHeightChanged);
 
-            _sliderLiveR.UnregisterValueChangedCallback(_ => HandleLiveColorChanged());
-            _sliderLiveG.UnregisterValueChangedCallback(_ => HandleLiveColorChanged());
-            _sliderLiveB.UnregisterValueChangedCallback(_ => HandleLiveColorChanged());
-
-            _sliderDeadR.UnregisterValueChangedCallback(_ => HandleDeadColorChanged());
-            _sliderDeadG.UnregisterValueChangedCallback(_ => HandleDeadColorChanged());
-            _sliderDeadB.UnregisterValueChangedCallback(_ => HandleDeadColorChanged());
+            _pickerLive.OnColorChanged -= HandleLiveColorChanged;
+            _pickerDead.OnColorChanged -= HandleDeadColorChanged;
 
             _dropdownStrategy.UnregisterValueChangedCallback(HandleStrategyChanged);
         }
@@ -187,17 +161,13 @@ namespace GameOfLife.UI
         private void HandleWidthChanged(ChangeEvent<int> evt) => _viewModel.SetWidth(evt.newValue);
         private void HandleHeightChanged(ChangeEvent<int> evt) => _viewModel.SetHeight(evt.newValue);
 
-        private void HandleLiveColorChanged()
+        private void HandleLiveColorChanged(Color color)
         {
-            Color32 color = new Color32((byte)_sliderLiveR.value, (byte)_sliderLiveG.value, (byte)_sliderLiveB.value, 255);
-            _previewLive.style.backgroundColor = new StyleColor(color);
             _viewModel.SetLiveColor(color);
         }
 
-        private void HandleDeadColorChanged()
+        private void HandleDeadColorChanged(Color color)
         {
-            Color32 color = new Color32((byte)_sliderDeadR.value, (byte)_sliderDeadG.value, (byte)_sliderDeadB.value, 255);
-            _previewDead.style.backgroundColor = new StyleColor(color);
             _viewModel.SetDeadColor(color);
         }
 
