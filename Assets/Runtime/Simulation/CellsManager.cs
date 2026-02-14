@@ -23,12 +23,12 @@ namespace GameOfLife.Simulation
 
         public int width = 512;
         public int height = 512;
-        [SerializeField] private Color32 liveColor = Color.white;
-        [SerializeField] private Color32 deadColor = Color.black;
+        public Color32 liveColor = Color.white;
+        public Color32 deadColor = Color.black;
 
         [HideInInspector]
         public int seedCount = 50000;
-        [SerializeField] private float speed = 60f;
+        [SerializeField] public float speed = 60f;
 
         private System.Random _random = new System.Random();
         private NativeArray<bool> _currentGeneration;
@@ -150,6 +150,41 @@ namespace GameOfLife.Simulation
         public void PauseSimulation() => _isOnPause = !_isOnPause;
 
         public void SetSpeed(float newSpeed) => speed = newSpeed;
+
+        public void SetDimensions(int newWidth, int newHeight)
+        {
+            width = Mathf.Max(1, newWidth);
+            height = Mathf.Max(1, newHeight);
+            Reinitialize();
+        }
+
+        public void SetLiveColor(Color32 color) => liveColor = color;
+        public void SetDeadColor(Color32 color) => deadColor = color;
+        public void SetSimulationType(SimulationType type) => currentType = type;
+
+        public void Reinitialize()
+        {
+            if (_simulationCoroutine != null)
+            {
+                StopCoroutine(_simulationCoroutine);
+                _simulationCoroutine = null;
+            }
+
+            if (_currentGeneration.IsCreated) _currentGeneration.Dispose();
+            if (_nextGeneration.IsCreated) _nextGeneration.Dispose();
+
+            _currentGeneration = new NativeArray<bool>(width * height, Allocator.Persistent);
+            _nextGeneration = new NativeArray<bool>(width * height, Allocator.Persistent);
+
+            if (simulationRenderer != null)
+            {
+                simulationRenderer.Initialize(width, height);
+            }
+
+            GenerateCells();
+            _isOnPause = false;
+            _simulationCoroutine = StartCoroutine(SimulationLoop());
+        }
 
         private void OnDestroy()
         {

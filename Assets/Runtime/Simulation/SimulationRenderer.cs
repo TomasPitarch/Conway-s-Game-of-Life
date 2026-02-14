@@ -9,10 +9,12 @@ namespace GameOfLife.Simulation
 
         public void Initialize(int width, int height)
         {
+            if (_texture != null) Destroy(_texture);
             _texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
             _texture.filterMode = FilterMode.Point;
             _texture.wrapMode = TextureWrapMode.Clamp;
 
+            if (spriteRenderer.sprite != null) Destroy(spriteRenderer.sprite);
             spriteRenderer.sprite = Sprite.Create(
                 _texture,
                 new Rect(0, 0, width, height),
