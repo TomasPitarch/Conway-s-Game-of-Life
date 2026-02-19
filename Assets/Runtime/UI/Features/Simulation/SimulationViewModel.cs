@@ -15,17 +15,11 @@ namespace GameOfLife.UI
             _cellsManager = cellsManager;
         }
 
-        /// <summary>
-        /// Subscribes to model/service events.
-        /// </summary>
         public void Initialize()
         {
             _cellsManager.OnAliveCellsChanged += HandleAliveCellsChanged;
         }
 
-        /// <summary>
-        /// Performs cleanup to avoid memory leaks.
-        /// </summary>
         public void Cleanup()
         {
             _cellsManager.OnAliveCellsChanged -= HandleAliveCellsChanged;

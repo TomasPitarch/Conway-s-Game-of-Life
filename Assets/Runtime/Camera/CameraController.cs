@@ -10,14 +10,14 @@ namespace GameOfLife.Camera
 
         private InputSystem_Actions _input;
 
-        [Header("Ajustes de Zoom")]
+        [Header("Zoom Settings")]
         public float zoomSpeed = 5f;
         public float smoothness = 10f;
         public float minZoom = 2f;
         public float maxZoom = 20f;
         public float zoomThreshold = 0.1f;
 
-        [Header("Ajustes de Paneo")]
+        [Header("Pan Settings")]
         public float panSpeed = 1f;
 
         private bool _isPanning;
@@ -39,14 +39,12 @@ namespace GameOfLife.Camera
             _targetPosition = _camera.transform.position;
             _input.UI.ScrollWheel.performed += OnScrollZoom;
 
-            // Use 'performed' to start the action, but rely on IsPressed in the routine for stopping
             _input.UI.RightClick.performed += _ => StartPan();
             _input.UI.MiddleClick.performed += _ => StartPan();
         }
 
         private void StartPan()
         {
-            // Only start if not already panning
             if (!_isPanning)
             {
                 _isPanning = true;
@@ -59,7 +57,6 @@ namespace GameOfLife.Camera
         {
             while (_isPanning)
             {
-                // Check if button is still held down
                 if (!_input.UI.RightClick.IsPressed() && !_input.UI.MiddleClick.IsPressed())
                 {
                     _isPanning = false;
@@ -69,7 +66,7 @@ namespace GameOfLife.Camera
                 Vector3 currentPos = _camera.ScreenToWorldPoint(_input.UI.Point.ReadValue<Vector2>());
                 Vector3 difference = _dragOrigin - currentPos;
 
-                difference.z = 0; // Lock Z axis
+                difference.z = 0;
 
                 _camera.transform.position += difference;
                 _targetPosition += difference;

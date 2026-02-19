@@ -7,9 +7,6 @@ namespace GameOfLife.UI
     [UxmlElement]
     public partial class RuntimeColorPicker : VisualElement
     {
-        #pragma warning disable CS0618
-        public new class UxmlFactory : UxmlFactory<RuntimeColorPicker, UxmlTraits> { }
-        #pragma warning restore CS0618
         public event Action<Color> OnColorChanged;
 
         private VisualElement _svBox;
@@ -73,7 +70,6 @@ namespace GameOfLife.UI
             _svBox.RegisterCallback<PointerDownEvent>(OnSVPointerDown);
             _svBox.RegisterCallback<PointerMoveEvent>(OnSVPointerMove);
             _svBox.RegisterCallback<PointerUpEvent>(OnSVPointerUp);
-            // Capture pointer to handle dragging outside the element
             _svBox.RegisterCallback<PointerCaptureOutEvent>(evt => _isDraggingSV = false);
 
 
@@ -87,7 +83,6 @@ namespace GameOfLife.UI
 
         private void OnDetach(DetachFromPanelEvent evt)
         {
-             // Cleanup if needed
              if (_hueTexture != null) UnityEngine.Object.DestroyImmediate(_hueTexture);
              if (_svTexture != null) UnityEngine.Object.DestroyImmediate(_svTexture);
              _hueTexture = null;
@@ -198,8 +193,6 @@ namespace GameOfLife.UI
         }
 
 
-        // --- Texture Generation ---
-
         private void GenerateHueTexture()
         {
             int width = 128; // Resolution
@@ -217,8 +210,6 @@ namespace GameOfLife.UI
 
         private void UpdateSVTexture()
         {
-             // Optimization: Regenerate only when hue changes significantly? 
-             // For now, doing it every update for simplicity, it's small (32x32).
              int size = 32; 
              Color[] cols = new Color[size * size];
              for (int y = 0; y < size; y++)

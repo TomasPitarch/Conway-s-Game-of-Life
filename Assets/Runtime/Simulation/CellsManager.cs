@@ -85,7 +85,6 @@ namespace GameOfLife.Simulation
 
         private int CountAliveCells()
         {
-            // Optimized counting using Burst-compiled Job
             NativeReference<int> countRef = new NativeReference<int>(Allocator.TempJob);
             CountAliveJob job = new CountAliveJob
             {
@@ -144,7 +143,7 @@ namespace GameOfLife.Simulation
                 _simulationCoroutine = null;
             }
             GenerateCells();
-            SimulationStep(); // Update texture immediately
+            SimulationStep();
         }
 
         public void PauseSimulation() => _isOnPause = !_isOnPause;
