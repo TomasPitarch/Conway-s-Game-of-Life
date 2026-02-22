@@ -26,6 +26,7 @@ namespace GameOfLife.UI
 
         private DropdownField _dropdownStrategy;
         private Slider _sliderSpeed;
+        private SliderInt _sliderBrushRadius;
         private Button _btnStart, _btnPause, _btnApplyDimensions, _btnQuit;
 
         private void Awake()
@@ -53,6 +54,7 @@ namespace GameOfLife.UI
             _dropdownStrategy.choices = new List<string> { SimulationType.Classic.ToString(), SimulationType.Burst.ToString() };
 
             _sliderSpeed = _root.Q<Slider>("SliderSpeed");
+            _sliderBrushRadius = _root.Q<SliderInt>("SliderBrushRadius");
 
             _btnStart = _root.Q<Button>("BtnStart");
             _btnPause = _root.Q<Button>("BtnPause");
@@ -78,6 +80,7 @@ namespace GameOfLife.UI
             _viewModel.SetWidth(cellsManager.width);
             _viewModel.SetHeight(cellsManager.height);
             _viewModel.SetSimulationType(cellsManager.currentType);
+            _viewModel.SetBrushRadius(cellsManager.brushRadius);
 
             _fieldWidth.value = cellsManager.width;
             _fieldHeight.value = cellsManager.height;
@@ -85,6 +88,9 @@ namespace GameOfLife.UI
 
             _pickerLive.value = cellsManager.liveColor;
             _pickerDead.value = cellsManager.deadColor;
+            
+            if (_sliderBrushRadius != null)
+                _sliderBrushRadius.value = cellsManager.brushRadius;
         }
 
         private void OnDisable()
@@ -101,6 +107,7 @@ namespace GameOfLife.UI
             _viewModel.OnTargetCellsChanged += HandleTargetCellsChanged;
             _viewModel.OnPauseStatusChanged += HandlePauseStatusChanged;
             _viewModel.OnFPSChanged += HandleFPSChanged;
+            _viewModel.OnBrushRadiusChanged += HandleBrushRadiusChanged;
         }
 
         private void UnbindViewModel()
@@ -110,6 +117,7 @@ namespace GameOfLife.UI
             _viewModel.OnTargetCellsChanged -= HandleTargetCellsChanged;
             _viewModel.OnPauseStatusChanged -= HandlePauseStatusChanged;
             _viewModel.OnFPSChanged -= HandleFPSChanged;
+            _viewModel.OnBrushRadiusChanged -= HandleBrushRadiusChanged;
         }
 
         private void BindUIElements()
@@ -123,6 +131,7 @@ namespace GameOfLife.UI
             _fieldTargetCells.RegisterValueChangedCallback(HandleTargetCellsFieldChanged);
             _fieldWidth.RegisterValueChangedCallback(HandleWidthChanged);
             _fieldHeight.RegisterValueChangedCallback(HandleHeightChanged);
+            _sliderBrushRadius.RegisterValueChangedCallback(HandleBrushRadiusSliderChanged);
 
             _pickerLive.OnColorChanged += HandleLiveColorChanged;
             _pickerDead.OnColorChanged += HandleDeadColorChanged;
@@ -141,6 +150,7 @@ namespace GameOfLife.UI
             _fieldTargetCells.UnregisterValueChangedCallback(HandleTargetCellsFieldChanged);
             _fieldWidth.UnregisterValueChangedCallback(HandleWidthChanged);
             _fieldHeight.UnregisterValueChangedCallback(HandleHeightChanged);
+            _sliderBrushRadius.UnregisterValueChangedCallback(HandleBrushRadiusSliderChanged);
 
             _pickerLive.OnColorChanged -= HandleLiveColorChanged;
             _pickerDead.OnColorChanged -= HandleDeadColorChanged;
@@ -154,12 +164,17 @@ namespace GameOfLife.UI
         private void HandleTargetCellsChanged(int target) => _fieldTargetCells.value = target;
         private void HandlePauseStatusChanged(bool isPaused) => _btnPause.text = isPaused ? "Resume" : "Pause";
         private void HandleFPSChanged(float fps) => _labelFPS.text = fps.ToString("F0");
+        private void HandleBrushRadiusChanged(int radius)
+        {
+            if (_sliderBrushRadius != null) _sliderBrushRadius.value = radius;
+        }
 
         // UI Event Handlers
         private void HandleSpeedSliderChanged(ChangeEvent<float> evt) => _viewModel.SetSpeed(evt.newValue);
         private void HandleTargetCellsFieldChanged(ChangeEvent<int> evt) => _viewModel.SetTargetCells(evt.newValue);
         private void HandleWidthChanged(ChangeEvent<int> evt) => _viewModel.SetWidth(evt.newValue);
         private void HandleHeightChanged(ChangeEvent<int> evt) => _viewModel.SetHeight(evt.newValue);
+        private void HandleBrushRadiusSliderChanged(ChangeEvent<int> evt) => _viewModel.SetBrushRadius(evt.newValue);
 
         private void HandleLiveColorChanged(Color color)
         {

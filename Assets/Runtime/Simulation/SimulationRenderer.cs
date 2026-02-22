@@ -35,5 +35,13 @@ namespace GameOfLife.Simulation
         {
             return _texture.GetRawTextureData<Color32>();
         }
+
+        public Vector2Int WorldToGrid(Vector3 worldPos)
+        {
+            Vector3 localPos = spriteRenderer.transform.InverseTransformPoint(worldPos);
+            int x = Mathf.RoundToInt(localPos.x * 100f + _texture.width * 0.5f);
+            int y = Mathf.RoundToInt(localPos.y * 100f + _texture.height * 0.5f);
+            return new Vector2Int(x, y);
+        }
     }
 }

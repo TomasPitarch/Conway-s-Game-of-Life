@@ -23,6 +23,7 @@ namespace GameOfLife.Simulation
 
         public int width = 512;
         public int height = 512;
+        public int brushRadius = 1;
         public Color32 liveColor = Color.white;
         public Color32 deadColor = Color.black;
 
@@ -146,10 +147,78 @@ namespace GameOfLife.Simulation
             SimulationStep();
         }
 
+        public void SetCellState(int x, int y, bool isAlive)
+        {
+            if (x < 0 || x >= width || y < 0 || y >= height) return;
+            
+            int index = y * width + x;
+            _currentGeneration[index] = isAlive;
+            
+            // Immediate feedback update in the texture buffer
+            if (simulationRenderer != null)
+            {
+                var textureData = simulationRenderer.GetRawTextureData();
+                if (textureData.IsCreated)
+                {
+                    textureData[index] = isAlive ? liveColor : deadColor;
+                    simulationRenderer.ApplyTexture();
+                }
+            }
+        }
+
+        public void PaintAtWorldPosition(Vector3 worldPos, bool isAlive = true)
+        {
+            if (simulationRenderer == null) return;
+            Vector2Int gridPos = simulationRenderer.WorldToGrid(worldPos);
+
+            if (brushRadius <= 1)
+            {
+                SetCellState(gridPos.x, gridPos.y, isAlive);
+            }
+            else
+            {
+                List<Vector2Int> positions = new List<Vector2Int>();
+                int r2 = brushRadius * brushRadius;
+                
+                for (int x = -brushRadius; x <= brushRadius; x++)
+                {
+                    for (int y = -brushRadius; y <= brushRadius; y++)
+                    {
+                        if (x * x + y * y <= r2)
+                        {
+                            positions.Add(new Vector2Int(gridPos.x + x, gridPos.y + y));
+                        }
+                    }
+                }
+                
+                SetCellsBatch(positions, isAlive);
+            }
+        }
+
+        public void SetCellsBatch(IEnumerable<Vector2Int> positions, bool isAlive)
+        {
+            if (simulationRenderer == null) return;
+            
+            var textureData = simulationRenderer.GetRawTextureData();
+            bool textureValid = textureData.IsCreated;
+            
+            foreach (var pos in positions)
+            {
+                if (pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height) continue;
+                
+                int index = pos.y * width + pos.x;
+                _currentGeneration[index] = isAlive;
+                if (textureValid) textureData[index] = isAlive ? liveColor : deadColor;
+            }
+            
+            simulationRenderer.ApplyTexture();
+            
+            int aliveCount = CountAliveCells();
+            OnAliveCellsChanged?.Invoke(aliveCount);
+        }
+
         public void PauseSimulation() => _isOnPause = !_isOnPause;
-
         public void SetSpeed(float newSpeed) => speed = newSpeed;
-
         public void SetDimensions(int newWidth, int newHeight)
         {
             width = Mathf.Max(1, newWidth);
@@ -160,6 +229,7 @@ namespace GameOfLife.Simulation
         public void SetLiveColor(Color32 color) => liveColor = color;
         public void SetDeadColor(Color32 color) => deadColor = color;
         public void SetSimulationType(SimulationType type) => currentType = type;
+        public void SetBrushRadius(int radius) => brushRadius = radius;
 
         public void Reinitialize()
         {

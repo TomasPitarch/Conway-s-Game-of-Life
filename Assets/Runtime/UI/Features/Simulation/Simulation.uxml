@@ -23,6 +23,7 @@
             <ui:DropdownField name="DropdownStrategy" label="Strategy"/>
             <ui:Slider name="SliderSpeed" label="Speed" low-value="1" high-value="120" value="60"/>
             <ui:IntegerField name="FieldTargetCells" label="Seed" value="50000"/>
+            <ui:SliderInt name="SliderBrushRadius" label="Brush Radius" low-value="1" high-value="30" value="1" class="compact-slider"/>
 
             <ui:Label text="RENDER" class="section-header"/>
             <ui:VisualElement style="flex-direction: row;">

@@ -14,6 +14,7 @@ namespace GameOfLife.UI
         public Color32 LiveColor { get; set; }
         public Color32 DeadColor { get; set; }
         public SimulationType SimulationType { get; set; }
+        public int BrushRadius { get; set; }
         public float FPS { get; set; }
     }
 }

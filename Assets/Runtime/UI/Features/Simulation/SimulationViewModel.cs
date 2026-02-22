@@ -40,7 +40,15 @@ namespace GameOfLife.UI
         public event Action<Color32> OnLiveColorChanged;
         public event Action<Color32> OnDeadColorChanged;
         public event Action<SimulationType> OnSimulationTypeChanged;
+        public event Action<int> OnBrushRadiusChanged;
         public event Action<float> OnFPSChanged;
+
+        public void SetBrushRadius(int radius)
+        {
+            _model.BrushRadius = radius;
+            _cellsManager.SetBrushRadius(radius);
+            OnBrushRadiusChanged?.Invoke(radius);
+        }
 
         public void SetSpeed(float value)
         {
